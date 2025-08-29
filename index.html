@@ -86,6 +86,229 @@
       </aside>
     </div>
   </main>
+  
+ 
+  <script>
+    
+    const services = [
+      { id: 'nat-999', icon: '🛡️', name: 'National Emergency Number',bn: 'জাতীয় জরুরি সেবা' , number: '999', category: 'All' },
+      { id: 'pol-999', icon: '👮‍♂️', name: 'Police Helpline Number', bn: 'পুলিশ হেল্পলাইন', number: '999', category: 'Police' },
+      { id: 'fir-999', icon: '🔥',   name: 'Fire Service Number',     bn: 'ফায়ার সার্ভিস',    number: '999', category: 'Fire' },
+      { id: 'amb-1994',icon: '🚑',  name: 'Ambulance Service',        bn: 'অ্যাম্বুলেন্স সেবা', number: '1994-999999', category: 'Health' },
+      { id: 'wom-109', icon: '👩‍👧',name: 'Women & Child Helpline',  bn: 'নারী ও শিশু হেল্পলাইন', number: '109', category: 'Hope' },
+      { id: 'acc-106', icon: '🏛️', name: 'Anti-Corruption Helpline',bn: 'দুদক হেল্পলাইন',    number: '106', category: 'Govt.' },
+      { id: 'ele-16216',icon:'⚡',  name: 'Electricity Helpline',     bn: 'বিদ্যুৎ হেল্পলাইন', number: '16216', category: 'Electricity' },
+      { id: 'brc-16445',icon:'🏥',  name: 'BRAC Helpline',            bn: 'ব্র্যাক হেল্পলাইন', number: '16445', category: 'NGO' },
+      { id: 'rail-163', icon:'🚆',  name: 'Bangladesh Railway Helpline', bn: 'বাংলাদেশ রেলওয়ে', number: '163', category: 'Travel' },
+    ];
+
+    // ==========================================================
+    // SECTION 2: STATE - অ্যাপ্লিকেশনের বর্তমান অবস্থা ট্র্যাক করার ভ্যারিয়েবল
+    // ==========================================================
+    let heartCount = 0;   // হার্ট কাউন্ট ট্র্যাক করে
+    let coinCount = 100;  // কয়েন কাউন্ট ট্র্যাক করে
+    let copyCount = 0;    // কপি কাউন্ট ট্র্যাক করে
+
+    // ==========================================================
+    // SECTION 3: DOM ELEMENTS - HTML এলিমেন্টগুলোকে সিলেক্ট করে ভ্যারিয়েবলে রাখা
+    // ==========================================================
+    // এটি পারফর্মেন্স বাড়ায়, কারণ বারবার DOM থেকে এলিমেন্ট খুঁজতে হয় না।
+    const heartEl = document.getElementById('heartCount');
+    const coinEl  = document.getElementById('coinCount');
+    const copyEl  = document.getElementById('copyCount');
+    const cardsEl = document.getElementById('cards');
+    const historyList = document.getElementById('historyList');
+    const emptyHistory = document.getElementById('emptyHistory');
+
+    // ==========================================================
+    // SECTION 4: UTILITY FUNCTIONS - ছোট ছোট সাহায্যকারী ফাংশন
+    // ==========================================================
+
+    // Navbar-এর কাউন্ট আপডেট করার জন্য ৩টি ফাংশন
+    function updateHearts(){ heartEl.textContent = heartCount; }
+    function updateCoins(){ coinEl.textContent  = coinCount; }
+    function updateCopies(){ copyEl.textContent = copyCount; }
+
+    // বর্তমান লোকাল সময় (যেমন: 11:36:58 AM) ফরম্যাট করে দেখানোর ফাংশন
+    function formatTime(date = new Date()){
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+    }
+
+    // কল হিস্ট্রি খালি থাকলে "No calls yet" মেসেজ দেখানোর ফাংশন
+    function ensureHistoryNote(){
+      const hasItems = historyList.querySelector('.history-item');
+      if(!hasItems && !historyList.querySelector('#emptyHistory')){
+        const li = document.createElement('li');
+        li.id='emptyHistory';
+        li.className='empty-note';
+        li.textContent='No calls yet';
+        historyList.appendChild(li);
+      }
+    }
+
+   
+    function removeEmptyNote(){
+      const note = document.getElementById('emptyHistory');
+      if(note) note.remove();
+    }
+
+    
+    function addHistory(name, number){
+      removeEmptyNote(); // প্রথমে empty নোটটি সরিয়ে ফেলি
+      const li = document.createElement('li'); // একটি নতুন list item (<li>) তৈরি করি
+      li.className = 'history-item';
+      const time = formatTime(new Date()); // বর্তমান সময় নিই
+      // li এলিমেন্টের ভিতরে HTML কন্টেন্ট সেট করি
+      li.innerHTML = `
+        <div>
+          <div class="hi-name">${name}</div>
+          <div class="hi-number">${number}</div>
+        </div>
+        <div class="hi-time" title="Local time">${time}</div>
+      `;
+      historyList.prepend(li);
+    }
+
+   
+    async function copyToClipboard(text){
+      try{
+        if(navigator.clipboard && window.isSecureContext){
+          // আধুনিক ও নিরাপদ উপায়
+          await navigator.clipboard.writeText(text);
+          return true;
+        }else{
+          
+          const ta = document.createElement('textarea');
+          ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          return true;
+        }
+      }catch(e){
+        console.error('Copy failed', e);
+        return false;
+      }
+    }
+
+    // ==========================================================
+    // SECTION 5: RENDER FUNCTION - কার্ডগুলো তৈরি করে ওয়েবসাইটে দেখানো
+    // ==========================================================
+    function renderCards(){
+      const frag = document.createDocumentFragment(); // পারফর্মেন্সের জন্য একটি fragment তৈরি করি
+      services.forEach(s=>{
+        const el = document.createElement('article'); // প্রতিটি সার্ভিসের জন্য একটি <article> ট্যাগ তৈরি করি
+        el.className = 'card';
+        el.dataset.id = s.id;
+        // কার্ডের ভিতরের HTML কন্টেন্ট তৈরি করি
+        el.innerHTML = `
+          <div class="top">
+            <div class="avatar">
+              <div class="icon" aria-hidden="true">${s.icon}</div>
+              <div class="names">
+                <div class="bn">${s.bn}</div>
+                <div class="en">${s.name}</div>
+              </div>
+            </div>
+            <button class="heart-btn" title="Send a heart" aria-label="Send a heart" data-id="${s.id}"><i class="fa-regular fa-heart"></i></button>
+          </div>
+          <div class="number" aria-label="Hotline number">${s.number}</div>
+          <div class="meta">
+            <span class="badge">${s.category}</span>
+            <a href="tel:${s.number}" style="font-size:12px; color:#16a34a" title="Tap to dial">tel:${s.number}</a>
+          </div>
+          <div class="actions">
+            <button class="btn btn-copy" data-name="${s.name}" data-number="${s.number}">
+              <span aria-hidden="true"><i class="fa-regular fa-copy"></i></span> Copy
+            </button>
+            <button class="btn btn-call" data-name="${s.name}" data-number="${s.number}">
+              <span aria-hidden="true"><i class="fa-solid fa-phone"></i></span> Call
+            </button>
+          </div>
+        `;
+        frag.appendChild(el); // fragment-এ কার্ডটি যুক্ত করি
+      });
+      cardsEl.appendChild(frag); // সব কার্ড একসাথে DOM-এ যুক্ত করি
+    }
+
+    // ==========================================================
+    // SECTION 6: EVENT LISTENERS - বাটন ক্লিকের কার্যকারিতা
+    // ==========================================================
+
+    // Event Delegation ব্যবহার করে সকল কার্ডের বাটনের জন্য একটি মাত্র listener
+    cardsEl.addEventListener('click', async (e)=>{
+     
+      const heartBtn = e.target.closest('.heart-btn');
+      const copyBtn  = e.target.closest('.btn-copy');
+      const callBtn  = e.target.closest('.btn-call');
+
+      // যদি হার্ট বাটনে ক্লিক হয়
+      if(heartBtn){
+        heartCount += 1; // হার্ট কাউন্ট বাড়াই
+        heartBtn.classList.add('bump'); // একটি অ্যানিমেশন ইফেক্ট দিই
+        setTimeout(()=>heartBtn.classList.remove('bump'), 150);
+        updateHearts(); // Navbar-এ আপডেট করি
+        return;
+      }
+
+      // যদি কপি বাটনে ক্লিক হয়
+      if(copyBtn){
+        const {name, number} = copyBtn.dataset; // ডেটা নিই
+        const ok = await copyToClipboard(number); // কপি ফাংশন কল করি
+        if(ok){
+          copyCount += 1; // কপি কাউন্ট বাড়াই
+          updateCopies(); // Navbar-এ আপডেট করি
+          alert(`Copied ${number} for ${name}`); // একটি মেসেজ দেখাই
+        }else{
+          alert('Copy failed. Please copy the number manually.');
+        }
+        return;
+      }
+
+      // যদি কল বাটনে ক্লিক হয়
+      if(callBtn){
+        const {name, number} = callBtn.dataset; // ডেটা নিই
+        // কয়েন চেক করি
+        if(coinCount < 20){
+          alert('Not enough coins to place a call. You need 20 coins.');
+          callBtn.classList.add('deny'); // বাটনটি লাল করি
+          setTimeout(()=>callBtn.classList.remove('deny'), 600);
+          return; // কাজ শেষ
+        }
+        coinCount -= 20; // কয়েন কাটি
+        updateCoins(); // Navbar-এ আপডেট করি
+        alert(`Calling ${name} at ${number}\n20 coins deducted. Remaining: ${coinCount}`);
+        addHistory(name, number); // কল হিস্ট্রিতে যোগ করি
+        return;
+      }
+    });
+
+    // উপরের হটলাইন (999) কল বাটনের জন্য আলাদা listener
+    document.getElementById('hotlineCall').addEventListener('click', (e)=>{
+      const {name, number} = e.currentTarget.dataset;
+      if(coinCount < 20){
+        alert('Not enough coins to place a call. You need 20 coins.');
+        return;
+      }
+      coinCount -= 20;
+      updateCoins();
+      alert(`Calling ${name} at ${number}\n20 coins deducted. Remaining: ${coinCount}`);
+      addHistory(name, number);
+    });
+
+    // 'Clear History' বাটনের listener
+    document.getElementById('clearHistory').addEventListener('click', ()=>{
+      historyList.innerHTML = ''; // হিস্ট্রি লিস্ট খালি করে ফেলি
+      ensureHistoryNote(); // "No calls yet" মেসেজ আবার দেখাই
+    });
+
+    // ==========================================================
+    // SECTION 7: INITIALIZATION - পেজ লোড হওয়ার সাথে সাথে যা যা করতে হবে
+    // ==========================================================
+    renderCards(); // কার্ডগুলো তৈরি করে দেখাই
+    updateHearts(); updateCoins(); updateCopies(); // Navbar-এর 초기 কাউন্ট সেট করি
+  </script>
 
 
     

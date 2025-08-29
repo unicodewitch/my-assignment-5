@@ -1,4 +1,30 @@
 
+    :root{
+      --bg:#f1f5f9;
+      --white:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --brand:#14532d;          /* Deep green */
+      --brand-2:#16a34a;        /* Accent green */
+      --ring:#d1fae5;           /* Soft green ring */
+      --card:#f0fdf4;           /* light green tint */
+      --border:#e2e8f0;
+      --danger:#dc2626;
+      --shadow:0 6px 20px rgba(2,6,23,.08);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0; padding:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; color:var(--text); background:var(--bg)}
+    a{color:inherit; text-decoration:none}
+    img{max-width:100%; display:block}
+
+    /* container helpers */
+    .container{max-width:1200px; margin:0 auto; padding:0 16px}
+    .stack-8{display:flex; gap:8px; align-items:center}
+    .stack-12{display:flex; gap:12px; align-items:center}
+
+    
+    
     nav.navbar{
       background:var(--white);
       border-bottom:1px solid var(--border);
