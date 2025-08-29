@@ -9,6 +9,10 @@
 
     <!-- css  -->
      <link rel="stylesheet" href="./styles/style.css">
+     <!-- font  -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Roboto:ital,wght@0,100..900;1,100..900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     
 </head>
 <body>
@@ -22,12 +26,12 @@
       <div class="stats">
         <div class="stat heart" title="Total hearts you tapped">
           <span id="heartCount">0</span>
-          <span aria-hidden="true">❤️</span>
+          <span aria-hidden="true"><img src="./assets/heart.png" alt="" class="heart-img"></span>
           
         </div>
         <div class="stat coins" title="Coins balance">
           <span id="coinCount">100</span>
-          <span aria-hidden="true">🪙</span>
+          <span aria-hidden="true"><img src="./assets/coin.png" alt="" class="coin-img"></span>
           
         </div>
         <div class="stat copy" title="How many numbers you copied">
@@ -46,6 +50,43 @@
       <p>Government emergency services at your fingertips — Bangladesh</p>
     </div>
   </header>
+  <!-- Main -->
+  <main class="shell container">
+    <div class="grid">
+      <!-- Left column -->
+      <section>
+        <!-- Emergency hotline notice -->
+        <div class="hotline" aria-label="Emergency Hotline">
+          <div class="left">
+            <span class="badge">Emergency</span>
+            <div>
+              <div style="font-weight:700">Call the national emergency number</div>
+              <div class="muted" style="color:var(--muted); font-size:12px">Police • Fire • Ambulance</div>
+            </div>
+          </div>
+          <div class="stack-12">
+            <div class="number">999</div>
+            <button class="btn" id="hotlineCall" data-name="National Emergency Number" data-number="999"><i class="fa-solid fa-phone"></i> Call</button>
+          </div>
+        </div>
+
+        <!-- Cards -->
+        <div class="cards" id="cards"></div>
+      </section>
+
+      <!-- Right column: History -->
+      <aside class="history" aria-label="Call history">
+        <div class="head">
+          <div class="title"><span aria-hidden="true"><i class="fa-solid fa-clock"></i></span> <span>Call History</span></div>
+          <button class="clear-btn" id="clearHistory">Clear</button>
+        </div>
+        <ul id="historyList" class="history-list">
+          <li class="empty-note" id="emptyHistory">No calls yet</li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+
 
     
 </body>
